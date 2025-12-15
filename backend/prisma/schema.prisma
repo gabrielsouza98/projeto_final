@@ -1,0 +1,300 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// MODELO: Usuario
+// ============================================================================
+model Usuario {
+  id                      String   @id @default(uuid())
+  nome                    String
+  email                   String   @unique
+  senha_hash              String   @map("senha_hash")
+  cidade                  String?
+  foto_url                String?  @map("foto_url")
+  visibilidade_participacao Boolean @default(true) @map("visibilidade_participacao")
+  rating_organizador      Float    @default(0.0) @map("rating_organizador")
+  role                    Role     @default(USER)
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  eventos_criados         Evento[]              @relation("OrganizadorEventos")
+  inscricoes              Inscricao[]
+  mensagens_enviadas      Mensagem[]            @relation("RemetenteMensagens")
+  mensagens_recebidas     Mensagem[]            @relation("DestinatarioMensagens")
+  avaliacoes              Avaliacao[]
+  certificados            Certificado[]
+  notificacoes            Notificacao[]
+  amizades_solicitadas    Amizade[]             @relation("SolicitanteAmizades")
+  amizades_recebidas      Amizade[]             @relation("DestinatarioAmizades")
+
+  @@map("usuarios")
+}
+
+enum Role {
+  USER
+  ORGANIZER
+}
+
+// ============================================================================
+// MODELO: Evento
+// ============================================================================
+model Evento {
+  id                    String    @id @default(uuid())
+  organizador_id        String    @map("organizador_id")
+  titulo                String
+  descricao             String    @db.Text
+  descricao_curta       String?   @map("descricao_curta")
+  local_endereco        String?   @map("local_endereco")
+  local_url             String?   @map("local_url")
+  data_inicio           DateTime  @map("data_inicio")
+  data_fim              DateTime  @map("data_fim")
+  preco                 Decimal   @default(0.0) @db.Decimal(10, 2)
+  tipo                  TipoEvento @default(GRATUITO)
+  chave_pix             String?   @map("chave_pix")
+  instrucoes_pagamento  String?   @db.Text @map("instrucoes_pagamento")
+  exige_aprovacao       Boolean   @default(false) @map("exige_aprovacao")
+  inscricao_abre        DateTime? @map("inscricao_abre")
+  inscricao_fecha       DateTime? @map("inscricao_fecha")
+  max_inscricoes        Int?      @map("max_inscricoes")
+  n_checkins_permitidos Int       @default(1) @map("n_checkins_permitidos")
+  status                StatusEvento @default(RASCUNHO)
+  banner_url            String?   @map("banner_url")
+  carga_horaria         Int?      @map("carga_horaria")
+  link_certificado      String?   @map("link_certificado")
+  nota_media            Float     @default(0.0) @map("nota_media")
+  created_at            DateTime  @default(now()) @map("created_at")
+  updated_at            DateTime  @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  organizador           Usuario       @relation("OrganizadorEventos", fields: [organizador_id], references: [id])
+  inscricoes            Inscricao[]
+  avaliacoes            Avaliacao[]
+  certificados          Certificado[]
+  amizades              Amizade[]
+
+  @@index([organizador_id])
+  @@index([status])
+  @@map("eventos")
+}
+
+enum TipoEvento {
+  GRATUITO
+  PAGO
+}
+
+enum StatusEvento {
+  RASCUNHO
+  PUBLICADO
+  INSCRICOES_ABERTAS
+  INSCRICOES_FECHADAS
+  EM_ANDAMENTO
+  FINALIZADO
+  ARQUIVADO
+}
+
+// ============================================================================
+// MODELO: Inscricao
+// ============================================================================
+model Inscricao {
+  id                    String    @id @default(uuid())
+  evento_id             String    @map("evento_id")
+  usuario_id            String    @map("usuario_id")
+  status                StatusInscricao @default(PENDENTE)
+  timestamp_inscricao   DateTime  @default(now()) @map("timestamp_inscricao")
+  timestamp_pagamento   DateTime? @map("timestamp_pagamento")
+  n_checkins_realizados Int       @default(0) @map("n_checkins_realizados")
+  certificado_emitido   Boolean   @default(false) @map("certificado_emitido")
+  created_at            DateTime  @default(now()) @map("created_at")
+  updated_at            DateTime  @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  evento                Evento           @relation(fields: [evento_id], references: [id])
+  usuario               Usuario          @relation(fields: [usuario_id], references: [id])
+  checkins              CheckinRegistro[]
+
+  @@unique([evento_id, usuario_id])
+  @@index([evento_id])
+  @@index([usuario_id])
+  @@index([status])
+  @@map("inscricoes")
+}
+
+enum StatusInscricao {
+  PENDENTE
+  AGUARDANDO_PAGAMENTO
+  APROVADA
+  RECUSADA
+  CANCELADA
+  CONFIRMADA
+}
+
+// ============================================================================
+// MODELO: CheckinRegistro
+// ============================================================================
+model CheckinRegistro {
+  id          String   @id @default(uuid())
+  inscricao_id String  @map("inscricao_id")
+  timestamp   DateTime @default(now())
+  metodo      MetodoCheckin @default(MANUAL)
+  observacoes String?  @db.Text
+  created_at  DateTime @default(now()) @map("created_at")
+
+  // Relacionamentos
+  inscricao   Inscricao @relation(fields: [inscricao_id], references: [id])
+
+  @@index([inscricao_id])
+  @@map("checkin_registros")
+}
+
+enum MetodoCheckin {
+  MANUAL
+  QR
+}
+
+// ============================================================================
+// MODELO: Amizade
+// ============================================================================
+model Amizade {
+  id              String        @id @default(uuid())
+  solicitante_id  String        @map("solicitante_id")
+  destinatario_id String        @map("destinatario_id")
+  status          StatusAmizade @default(PENDENTE)
+  evento_id       String?       @map("evento_id")
+  timestamp       DateTime      @default(now())
+  created_at      DateTime      @default(now()) @map("created_at")
+  updated_at      DateTime      @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  solicitante     Usuario       @relation("SolicitanteAmizades", fields: [solicitante_id], references: [id])
+  destinatario    Usuario       @relation("DestinatarioAmizades", fields: [destinatario_id], references: [id])
+  evento          Evento?       @relation(fields: [evento_id], references: [id])
+
+  @@unique([solicitante_id, destinatario_id])
+  @@index([solicitante_id])
+  @@index([destinatario_id])
+  @@map("amizades")
+}
+
+enum StatusAmizade {
+  PENDENTE
+  ACEITA
+  RECUSADA
+  BLOQUEADA
+}
+
+// ============================================================================
+// MODELO: Mensagem
+// ============================================================================
+model Mensagem {
+  id              String      @id @default(uuid())
+  remetente_id    String      @map("remetente_id")
+  destinatario_id String      @map("destinatario_id")
+  tipo            TipoMensagem @default(TEXTO)
+  conteudo        String      @db.Text
+  anexo_url       String?      @map("anexo_url")
+  lida            Boolean     @default(false)
+  timestamp       DateTime    @default(now())
+  created_at      DateTime    @default(now()) @map("created_at")
+
+  // Relacionamentos
+  remetente       Usuario     @relation("RemetenteMensagens", fields: [remetente_id], references: [id])
+  destinatario    Usuario     @relation("DestinatarioMensagens", fields: [destinatario_id], references: [id])
+
+  @@index([destinatario_id])
+  @@index([lida])
+  @@map("mensagens")
+}
+
+enum TipoMensagem {
+  TEXTO
+  IMAGEM
+  ARQUIVO
+}
+
+// ============================================================================
+// MODELO: Avaliacao
+// ============================================================================
+model Avaliacao {
+  id        String   @id @default(uuid())
+  evento_id String   @map("evento_id")
+  usuario_id String  @map("usuario_id")
+  nota      Int      // 1 a 5
+  comentario String? @db.Text
+  timestamp DateTime @default(now())
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  evento    Evento   @relation(fields: [evento_id], references: [id])
+  usuario   Usuario  @relation(fields: [usuario_id], references: [id])
+
+  @@unique([evento_id, usuario_id])
+  @@index([evento_id])
+  @@map("avaliacoes")
+}
+
+// ============================================================================
+// MODELO: Certificado
+// ============================================================================
+model Certificado {
+  id              String   @id @default(uuid())
+  evento_id       String   @map("evento_id")
+  usuario_id      String   @map("usuario_id")
+  url_pdf         String   @map("url_pdf")
+  data_emissao    DateTime @default(now()) @map("data_emissao")
+  codigo_validacao String  @unique @map("codigo_validacao")
+  created_at      DateTime @default(now()) @map("created_at")
+
+  // Relacionamentos
+  evento          Evento   @relation(fields: [evento_id], references: [id])
+  usuario         Usuario  @relation(fields: [usuario_id], references: [id])
+
+  @@unique([evento_id, usuario_id])
+  @@index([evento_id])
+  @@index([usuario_id])
+  @@map("certificados")
+}
+
+// ============================================================================
+// MODELO: Notificacao
+// ============================================================================
+model Notificacao {
+  id        String          @id @default(uuid())
+  usuario_id String         @map("usuario_id")
+  tipo      TipoNotificacao
+  titulo    String
+  mensagem  String          @db.Text
+  lida      Boolean         @default(false)
+  link      String?
+  created_at DateTime       @default(now()) @map("created_at")
+
+  // Relacionamentos
+  usuario   Usuario         @relation(fields: [usuario_id], references: [id])
+
+  @@index([usuario_id])
+  @@index([lida])
+  @@map("notificacoes")
+}
+
+enum TipoNotificacao {
+  INSCRICAO_RECEBIDA
+  INSCRICAO_APROVADA
+  INSCRICAO_RECUSADA
+  PAGAMENTO_CONFIRMADO
+  EVENTO_PROXIMO
+  CERTIFICADO_DISPONIVEL
+  NOVA_MENSAGEM
+  PEDIDO_AMIZADE
+  AMIZADE_ACEITA
+  EVENTO_FINALIZADO
+}

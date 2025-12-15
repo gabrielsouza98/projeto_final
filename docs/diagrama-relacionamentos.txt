@@ -1,0 +1,141 @@
+================================================================================
+                    DIAGRAMA DE RELACIONAMENTOS - EventSync AI
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              USUARIO                                        │
+│  ────────────────────────────────────────────────────────────────────────  │
+│  • id                                                                       │
+│  • nome                                                                     │
+│  • email (UNIQUE)                                                           │
+│  • senha_hash                                                               │
+│  • cidade                                                                   │
+│  • foto_url                                                                 │
+│  • visibilidade_participacao                                                │
+│  • rating_organizador                                                       │
+│  • role (user/organizer)                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+         │                    │                    │                    │
+         │                    │                    │                    │
+         │ 1:N                │ 1:N                │ 1:N                │ 1:N
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   EVENTO     │    │  INSCRICAO   │    │  MENSAGEM    │    │  AVALIACAO   │
+│              │    │              │    │              │    │              │
+│ • id         │    │ • id         │    │ • id         │    │ • id         │
+│ • organizador│◄───┤ • evento_id  │    │ • remetente  │    │ • evento_id  │
+│ • titulo     │    │ • usuario_id │    │ • destinat.  │    │ • usuario_id │
+│ • descricao  │    │ • status     │    │ • conteudo   │    │ • nota (1-5) │
+│ • data_inicio│    │ • n_checkins │    │ • tipo       │    │ • comentario │
+│ • data_fim   │    │ • certificado│    │ • lida       │    │              │
+│ • preco      │    │              │    │              │    │              │
+│ • tipo       │    │              │    │              │    │              │
+│ • status     │    │              │    │              │    │              │
+│ • max_inscri │    │              │    │              │    │              │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+         │                    │
+         │ 1:N                │ 1:N
+         │                    │
+         ▼                    ▼
+┌──────────────┐    ┌──────────────┐
+│ CERTIFICADO  │    │ CHECKINREG.  │
+│              │    │              │
+│ • id         │    │ • id         │
+│ • evento_id  │    │ • inscricao  │
+│ • usuario_id │    │ • timestamp  │
+│ • url_pdf    │    │ • metodo     │
+│ • cod_valid  │    │              │
+│              │    │              │
+└──────────────┘    └──────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              AMIZADE                                        │
+│  ────────────────────────────────────────────────────────────────────────  │
+│  • id                                                                       │
+│  • solicitante_id ────┐                                                    │
+│  • destinatario_id ───┼───► Ambos referenciam USUARIO                      │
+│  • status             │                                                    │
+│  • evento_id (opc)    │                                                    │
+└───────────────────────┘                                                    │
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           NOTIFICACAO                                       │
+│  ────────────────────────────────────────────────────────────────────────  │
+│  • id                                                                       │
+│  • usuario_id ────────► Referencia USUARIO                                 │
+│  • tipo                                                                     │
+│  • titulo                                                                   │
+│  • mensagem                                                                 │
+│  • lida                                                                     │
+│  • link                                                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+                          FLUXO DE ESTADOS
+================================================================================
+
+EVENTO:
+  rascunho → publicado → inscricoes_abertas → em_andamento → finalizado → arquivado
+                              │
+                              └──→ inscricoes_fechadas → em_andamento → finalizado
+
+INSCRICAO:
+  [Automática]                [Manual]                    [Pago]
+  pendente ──┐                pendente ──┐                aguardando_pagamento
+             │                            │                        │
+             ▼                            ▼                        ▼
+        aprovada                    aprovada                  confirmada
+             │                            │                        │
+             └──────────────┬─────────────┘                        │
+                            ▼                                      │
+                    [Check-in realizado]                           │
+                            │                                      │
+                            ▼                                      │
+                    [Evento finalizado]                            │
+                            │                                      │
+                            ▼                                      │
+                    [Avaliação disponível]                         │
+                            │                                      │
+                            ▼                                      │
+                    [Certificado disponível]                       │
+
+AMIZADE:
+  pendente → aceita
+       │
+       └──→ recusada
+
+
+================================================================================
+                          REGRAS DE NEGÓCIO
+================================================================================
+
+1. INSCRIÇÃO:
+   ✓ Se evento.exige_aprovacao = false → status = aprovada (ou aguardando_pagamento)
+   ✓ Se evento.exige_aprovacao = true → status = pendente
+   ✓ Se evento.tipo = 'pago' → status inicial = aguardando_pagamento
+   ✓ Se max_inscricoes alcançado → novas inscrições = recusada
+
+2. CHECK-IN:
+   ✓ Só se inscrição = aprovada OU confirmada
+   ✓ Respeitar evento.n_checkins_permitidos
+   ✓ Incrementar inscricao.n_checkins_realizados
+
+3. AMIZADE:
+   ✓ Ambos devem estar inscritos no mesmo evento
+   ✓ Ambos com inscrição aprovada/confirmada
+   ✓ Verificar usuario.visibilidade_participacao
+
+4. AVALIAÇÃO:
+   ✓ Evento = finalizado
+   ✓ Participante com pelo menos 1 check-in
+   ✓ Uma avaliação por usuário por evento
+
+5. CERTIFICADO:
+   ✓ Geralmente: pelo menos 1 check-in
+   ✓ Evento finalizado ou próximo
+   ✓ Critérios configuráveis pelo organizador
+
+
+
