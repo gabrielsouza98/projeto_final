@@ -67,3 +67,9 @@ export class CheckinRepository implements ICheckinRepository {
 
 
 
+
+
+
+
+
+

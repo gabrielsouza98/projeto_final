@@ -8,12 +8,14 @@ import { ListAmizadesUseCase } from '../../application/use-cases/ListAmizadesUse
 import { AmizadeRepository } from '../../persistence/repositories/AmizadeRepository';
 import { InscricaoRepository } from '../../persistence/repositories/InscricaoRepository';
 import { UsuarioRepository } from '../../persistence/repositories/UsuarioRepository';
+import { EventoRepository } from '../../persistence/repositories/EventoRepository';
 import { SolicitarAmizadeDTO } from '../../shared/dto/amizade.dto';
 
 const amizadeRepository = new AmizadeRepository();
 const inscricaoRepository = new InscricaoRepository();
 const usuarioRepository = new UsuarioRepository();
-const solicitarAmizadeUseCase = new SolicitarAmizadeUseCase(amizadeRepository, inscricaoRepository, usuarioRepository);
+const eventoRepository = new EventoRepository();
+const solicitarAmizadeUseCase = new SolicitarAmizadeUseCase(amizadeRepository, inscricaoRepository, usuarioRepository, eventoRepository);
 const aceitarAmizadeUseCase = new AceitarAmizadeUseCase(amizadeRepository);
 const recusarAmizadeUseCase = new RecusarAmizadeUseCase(amizadeRepository);
 const listAmizadesUseCase = new ListAmizadesUseCase(amizadeRepository);
@@ -107,6 +109,9 @@ export class AmizadeController {
     }
   }
 }
+
+
+
 
 
 

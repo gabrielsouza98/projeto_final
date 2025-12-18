@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
 import MyRegistrations from './pages/MyRegistrations';
+import MyEvents from './pages/MyEvents';
 import CreateEvent from './pages/CreateEvent';
 import VirtualCard from './pages/VirtualCard';
 import ManageEventRegistrations from './pages/ManageEventRegistrations';
@@ -13,12 +14,16 @@ import Friends from './pages/Friends';
 import Messages from './pages/Messages';
 import RateEvent from './pages/RateEvent';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './App.css';
 
 // Home redireciona para login ou dashboard
 function Home() {
   const { isAuthenticated } = useAuth();
-  return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />;
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
@@ -56,6 +61,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <CreateEvent />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-events"
+        element={
+          <ProtectedRoute>
+            <MyEvents />
           </ProtectedRoute>
         }
       />
@@ -114,11 +127,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

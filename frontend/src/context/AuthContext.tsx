@@ -72,6 +72,7 @@ interface AuthContextType {
   login: (email: string, senha: string) => Promise<void>;
   register: (nome: string, email: string, senha: string, cidade: string) => Promise<void>;
   logout: () => void;
+  becomeOrganizer: () => Promise<void>;
   isAuthenticated: boolean;
   isOrganizer: boolean;
 }
@@ -155,11 +156,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'LOGOUT' });
   };
 
+  const becomeOrganizer = async () => {
+    try {
+      const response = await apiClient.put(api.endpoints.auth.becomeOrganizer);
+      
+      // O backend retorna { usuario, token } quando atualiza o role
+      if (response.data.token) {
+        const { usuario, token } = response.data;
+        
+        // Atualizar token e usuário no localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(usuario));
+        
+        // Atualizar estado com novo token e usuário
+        dispatch({ type: 'LOGIN_SUCCESS', payload: { user: usuario, token } });
+      } else {
+        // Se não retornou token, apenas atualizar usuário (caso já fosse organizador)
+        const updatedUser = response.data;
+        dispatch({ type: 'SET_USER', payload: updatedUser });
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Erro ao tornar-se organizador';
+      throw new Error(errorMessage);
+    }
+  };
+
   const value: AuthContextType = {
     state,
     login,
     register,
     logout,
+    becomeOrganizer,
     isAuthenticated: !!state.token && !!state.user,
     isOrganizer: state.user?.role === 'ORGANIZER',
   };

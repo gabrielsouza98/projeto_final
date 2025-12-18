@@ -1,0 +1,139 @@
+/* Melhorias Globais de Visual - EventSync AI */
+
+/* Ajustes gerais de espaçamento e layout */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Melhorias nos cards */
+.card-improved {
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.card-improved:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Melhorias nos inputs */
+.input-improved {
+  border: 1px solid #D1D5DB;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+}
+
+.input-improved:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Melhorias nos botões */
+.btn-improved {
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.625rem 1.25rem;
+}
+
+/* Espaçamentos consistentes */
+.section-spacing {
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .section-spacing {
+    margin-bottom: 2.5rem;
+  }
+}
+
+/* Títulos mais limpos */
+.title-main {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.title-sub {
+  font-size: 1rem;
+  color: #6B7280;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .title-main {
+    font-size: 2rem;
+  }
+  .title-sub {
+    font-size: 1.125rem;
+  }
+}
+
+/* Grid de cards melhorado */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Melhorias na navegação */
+.nav-link {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Melhorias em listas */
+.list-item {
+  padding: 1rem;
+  border-bottom: 1px solid #F3F4F6;
+  transition: background-color 0.2s ease;
+}
+
+.list-item:hover {
+  background-color: #F9FAFB;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+
+
+

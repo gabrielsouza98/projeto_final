@@ -1,0 +1,155 @@
+/* ============================================
+   MELHORIAS PROFISSIONAIS - EVENTSYNC AI
+   ============================================ */
+
+/* Garantir que a fonte Inter seja aplicada */
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+/* Melhorias nos gradientes para serem mais vibrantes */
+.bg-gradient-hero {
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Cards com sombra mais pronunciada */
+.card-professional {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.card-professional:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inputs mais destacados */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  border-width: 2px !important;
+  border-radius: 12px !important;
+  padding: 14px 18px !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: #6366F1 !important;
+  outline: none !important;
+}
+
+/* Botões mais impactantes */
+button[type="submit"],
+.btn-primary {
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: none !important;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button[type="submit"]:hover,
+.btn-primary:hover {
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+button[type="submit"]:active,
+.btn-primary:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* Melhorias na tipografia */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+  line-height: 1.2 !important;
+}
+
+/* Espaçamentos mais generosos */
+section, .section {
+  padding: 3rem 0 !important;
+}
+
+@media (min-width: 768px) {
+  section, .section {
+    padding: 4rem 0 !important;
+  }
+}
+
+/* Melhorias nos links */
+a {
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+a:hover {
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+}
+
+/* Badges mais destacados */
+.badge, [class*="badge"] {
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Melhorias gerais de profundidade */
+.shadow-professional {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Animações suaves */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Melhorias no scrollbar (opcional) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+

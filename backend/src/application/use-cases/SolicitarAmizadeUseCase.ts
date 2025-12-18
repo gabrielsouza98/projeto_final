@@ -4,12 +4,14 @@ import { SolicitarAmizadeDTO, AmizadeResponseDTO } from '../../shared/dto/amizad
 import { IAmizadeRepository } from '../../domain/repositories/IAmizadeRepository';
 import { IInscricaoRepository } from '../../domain/repositories/IInscricaoRepository';
 import { IUsuarioRepository } from '../../domain/repositories/IUsuarioRepository';
+import { IEventoRepository } from '../../domain/repositories/IEventoRepository';
 
 export class SolicitarAmizadeUseCase {
   constructor(
     private amizadeRepository: IAmizadeRepository,
     private inscricaoRepository: IInscricaoRepository,
-    private usuarioRepository: IUsuarioRepository
+    private usuarioRepository: IUsuarioRepository,
+    private eventoRepository: IEventoRepository
   ) {}
 
   async execute(data: SolicitarAmizadeDTO, solicitante_id: string): Promise<AmizadeResponseDTO> {
@@ -42,22 +44,36 @@ export class SolicitarAmizadeUseCase {
 
     // Se evento_id foi fornecido, verificar se ambos estão inscritos
     if (data.evento_id) {
+      // Buscar evento para verificar se o destinatário é o organizador
+      const evento = await this.eventoRepository.findById(data.evento_id);
+      if (!evento) {
+        throw new Error('Evento não encontrado');
+      }
+
+      const isDestinatarioOrganizador = evento.organizador_id === data.destinatario_id;
+
+      // Verificar se solicitante está inscrito e aprovado
       const inscricaoSolicitante = await this.inscricaoRepository.findByEventoAndUsuario(
         data.evento_id,
         solicitante_id
       );
-      const inscricaoDestinatario = await this.inscricaoRepository.findByEventoAndUsuario(
-        data.evento_id,
-        data.destinatario_id
-      );
 
-      if (!inscricaoSolicitante || inscricaoSolicitante.status !== 'APROVADA' && inscricaoSolicitante.status !== 'CONFIRMADA') {
+      if (!inscricaoSolicitante || (inscricaoSolicitante.status !== 'APROVADA' && inscricaoSolicitante.status !== 'CONFIRMADA')) {
         throw new Error('Você precisa estar inscrito e aprovado no evento para solicitar amizade');
       }
 
-      if (!inscricaoDestinatario || inscricaoDestinatario.status !== 'APROVADA' && inscricaoDestinatario.status !== 'CONFIRMADA') {
-        throw new Error('O destinatário precisa estar inscrito e aprovado no evento');
+      // Se o destinatário não é o organizador, verificar se está inscrito e aprovado
+      if (!isDestinatarioOrganizador) {
+        const inscricaoDestinatario = await this.inscricaoRepository.findByEventoAndUsuario(
+          data.evento_id,
+          data.destinatario_id
+        );
+
+        if (!inscricaoDestinatario || (inscricaoDestinatario.status !== 'APROVADA' && inscricaoDestinatario.status !== 'CONFIRMADA')) {
+          throw new Error('O destinatário precisa estar inscrito e aprovado no evento');
+        }
       }
+      // Se o destinatário é o organizador, não precisa verificar inscrição (organizador não precisa se inscrever)
     }
 
     // Criar solicitação de amizade
@@ -93,6 +109,9 @@ export class SolicitarAmizadeUseCase {
     };
   }
 }
+
+
+
 
 
 

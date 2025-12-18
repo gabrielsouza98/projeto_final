@@ -1,9 +1,10 @@
-// Página de Registro
+// Página de Registro - Refatorada com Design System
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
+import { Button, Input, Card } from '../components/ui';
 
 interface RegisterForm {
   nome: string;
@@ -40,7 +41,7 @@ export default function Register() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando...</p>
         </div>
       </div>
@@ -48,179 +49,166 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background decorativo */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen flex">
+      {/* Left Section - Hero */}
+      <div className="hidden lg:flex lg:w-2/3 bg-gradient-hero p-12 flex-col justify-center relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        
+        <div className="relative z-10 max-w-xl">
+          <div className="mb-8">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 border border-white/30">
+              <span className="text-4xl">✨</span>
+            </div>
+            <h1 className="text-5xl font-black text-white mb-6 leading-tight">
+              Comece a criar eventos incríveis!
+            </h1>
+            <p className="text-xl text-white/90 leading-relaxed mb-8">
+              Junte-se a milhares de organizadores que já usam o EventSync AI para gerenciar seus eventos com sucesso.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center text-white/90">
+                <span className="text-2xl mr-2">✓</span>
+                <span>Cadastro rápido e fácil</span>
+              </div>
+              <div className="flex items-center text-white/90">
+                <span className="text-2xl mr-2">✓</span>
+                <span>Interface intuitiva</span>
+              </div>
+              <div className="flex items-center text-white/90">
+                <span className="text-2xl mr-2">✓</span>
+                <span>Suporte completo</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="max-w-md w-full space-y-8 relative z-10 animate-fade-in">
-        <div className="glass-card rounded-2xl p-8 shadow-2xl">
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-secondary rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-              <span className="text-3xl">✨</span>
-            </div>
-            <h2 className="text-4xl font-bold text-gradient mb-2">
-              Criar Conta
-            </h2>
-            <p className="text-gray-600 font-medium">
-              Registre-se no EventSync AI
-            </p>
-          </div>
-
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg animate-slide-in">
-                <div className="flex items-center">
-                  <span className="mr-2">⚠️</span>
-                  <span>{error}</span>
-                </div>
-              </div>
-            )}
-            
-            <div className="space-y-5">
-              <div>
-                <label htmlFor="nome" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nome Completo
-                </label>
-                <input
-                  {...register('nome', {
-                    required: 'Nome é obrigatório',
-                    minLength: {
-                      value: 3,
-                      message: 'Nome deve ter no mínimo 3 caracteres'
-                    }
-                  })}
-                  id="nome"
-                  type="text"
-                  className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all duration-300"
-                  placeholder="João Silva"
-                />
-                {errors.nome && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
-                    <span className="mr-1">❌</span>
-                    {errors.nome.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  {...register('email', {
-                    required: 'Email é obrigatório',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Email inválido'
-                    }
-                  })}
-                  id="email"
-                  type="email"
-                  className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all duration-300"
-                  placeholder="seu@email.com"
-                />
-                {errors.email && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
-                    <span className="mr-1">❌</span>
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="cidade" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Cidade
-                </label>
-                <input
-                  {...register('cidade', {
-                    required: 'Cidade é obrigatória'
-                  })}
-                  id="cidade"
-                  type="text"
-                  className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all duration-300"
-                  placeholder="São Paulo"
-                />
-                {errors.cidade && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
-                    <span className="mr-1">❌</span>
-                    {errors.cidade.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="senha" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Senha
-                </label>
-                <input
-                  {...register('senha', {
-                    required: 'Senha é obrigatória',
-                    minLength: {
-                      value: 6,
-                      message: 'Senha deve ter no mínimo 6 caracteres'
-                    }
-                  })}
-                  id="senha"
-                  type="password"
-                  className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all duration-300"
-                  placeholder="••••••••"
-                />
-                {errors.senha && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
-                    <span className="mr-1">❌</span>
-                    {errors.senha.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="confirmarSenha" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Confirmar Senha
-                </label>
-                <input
-                  {...register('confirmarSenha', {
-                    required: 'Confirmação de senha é obrigatória',
-                    validate: (value) => value === senha || 'As senhas não coincidem'
-                  })}
-                  id="confirmarSenha"
-                  type="password"
-                  className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-all duration-300"
-                  placeholder="••••••••"
-                />
-                {errors.confirmarSenha && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center">
-                    <span className="mr-1">❌</span>
-                    {errors.confirmarSenha.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
+      {/* Right Section - Register Form */}
+      <div className="w-full lg:w-1/3 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md">
+          <Card padding="lg" className="card-professional border-0 bg-white">
             <div>
-              <button
-                type="submit"
-                className="btn-gradient w-full py-3 px-4 text-white font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-              >
-                <span className="flex items-center justify-center">
-                  <span className="mr-2">✨</span>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="lg:hidden mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <span className="text-3xl">✨</span>
+                </div>
+                <h1 className="text-3xl font-black text-gray-900 mb-2">
                   Criar Conta
-                </span>
-              </button>
-            </div>
+                </h1>
+                <p className="text-gray-600 text-base font-medium">
+                  Registre-se no EventSync AI
+                </p>
+              </div>
 
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-600">
-                Já tem uma conta?{' '}
-                <Link to="/login" className="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
-                  Faça login
-                </Link>
-              </p>
+              {/* Form */}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-h-[70vh] overflow-y-auto pr-2">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
+                  <div className="flex items-center">
+                    <span className="text-red-600 mr-3 text-xl">⚠️</span>
+                    <span className="text-sm font-semibold text-red-800">{error}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Nome Input */}
+              <Input
+                label="Nome Completo"
+                type="text"
+                placeholder="João Silva"
+                error={errors.nome?.message}
+                {...register('nome', {
+                  required: 'Nome é obrigatório',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome deve ter no mínimo 3 caracteres'
+                  }
+                })}
+              />
+
+              {/* Email Input */}
+              <Input
+                label="Email"
+                type="email"
+                placeholder="seu@email.com"
+                error={errors.email?.message}
+                {...register('email', {
+                  required: 'Email é obrigatório',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Email inválido'
+                  }
+                })}
+              />
+
+              {/* Cidade Input */}
+              <Input
+                label="Cidade"
+                type="text"
+                placeholder="São Paulo"
+                error={errors.cidade?.message}
+                {...register('cidade', {
+                  required: 'Cidade é obrigatória'
+                })}
+              />
+
+              {/* Senha Input */}
+              <Input
+                label="Senha"
+                type="password"
+                placeholder="••••••••"
+                error={errors.senha?.message}
+                helperText="Mínimo de 6 caracteres"
+                {...register('senha', {
+                  required: 'Senha é obrigatória',
+                  minLength: {
+                    value: 6,
+                    message: 'Senha deve ter no mínimo 6 caracteres'
+                  }
+                })}
+              />
+
+              {/* Confirmar Senha Input */}
+              <Input
+                label="Confirmar Senha"
+                type="password"
+                placeholder="••••••••"
+                error={errors.confirmarSenha?.message}
+                {...register('confirmarSenha', {
+                  required: 'Confirmação de senha é obrigatória',
+                  validate: (value) => value === senha || 'As senhas não coincidem'
+                })}
+              />
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-lg py-4 shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200"
+              >
+                Criar Conta
+              </Button>
+
+              {/* Login Link */}
+              <div className="text-center pt-6 border-t border-gray-100">
+                <p className="text-sm text-gray-600">
+                  Já tem uma conta?{' '}
+                  <Link
+                    to="/login"
+                    className="font-bold text-indigo-600 hover:text-purple-600 transition-colors"
+                  >
+                    Faça login →
+                  </Link>
+                </p>
+              </div>
+              </form>
             </div>
-          </form>
+          </Card>
         </div>
       </div>
     </div>

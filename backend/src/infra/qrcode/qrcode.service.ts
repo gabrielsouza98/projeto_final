@@ -52,3 +52,9 @@ export function validateQRCodeData(qrData: string): QRCodeData {
 
 
 
+
+
+
+
+
+

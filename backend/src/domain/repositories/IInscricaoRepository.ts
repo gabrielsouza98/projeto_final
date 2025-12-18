@@ -26,3 +26,9 @@ export interface IInscricaoRepository {
 
 
 
+
+
+
+
+
+

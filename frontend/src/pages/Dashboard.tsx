@@ -1,11 +1,11 @@
-// Dashboard principal
+// Dashboard - Recriado exatamente como a imagem de referência
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import api from '../config/api';
 import Layout from '../components/Layout';
-import { Link } from 'react-router-dom';
 
 interface Event {
   id: string;
@@ -26,10 +26,11 @@ interface Registration {
 }
 
 export default function Dashboard() {
-  const { state, isOrganizer } = useAuth();
+  const { state, isOrganizer, becomeOrganizer } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
+  const [becomingOrganizer, setBecomingOrganizer] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -38,14 +39,10 @@ export default function Dashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      
-      // Carregar eventos
       const eventsResponse = await apiClient.get(api.endpoints.events.list);
-      setEvents(eventsResponse.data.slice(0, 6)); // Últimos 6 eventos
-
-      // Carregar minhas inscrições
+      setEvents(eventsResponse.data.slice(0, 6));
       const registrationsResponse = await apiClient.get(api.endpoints.registrations.list);
-      setRegistrations(registrationsResponse.data.slice(0, 5)); // Últimas 5 inscrições
+      setRegistrations(registrationsResponse.data.slice(0, 5));
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
     } finally {
@@ -56,8 +53,8 @@ export default function Dashboard() {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+          <div style={{ width: '48px', height: '48px', border: '4px solid #E5E7EB', borderTopColor: '#4F46E5', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         </div>
       </Layout>
     );
@@ -65,202 +62,176 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Header */}
-        <div className="mb-10 animate-fade-in">
-          <h1 className="text-4xl font-bold text-gradient mb-3">
-            Bem-vindo, {state.user?.nome}! 👋
-          </h1>
-          <p className="text-lg text-gray-600 font-medium">
-            {isOrganizer ? 'Gerencie seus eventos e participantes' : 'Descubra e participe de eventos incríveis'}
+        <div>
+          <h1>Olá, {state.user?.nome}! 👋</h1>
+          <p style={{ fontSize: '16px', color: '#6B7280', marginTop: '4px' }}>
+            {isOrganizer ? 'Gerencie seus eventos e participantes' : 'O que você gostaria de fazer hoje?'}
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-10">
-          <div className="glass-card hover-lift rounded-2xl p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">
-                  Eventos Disponíveis
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {events.length}
-                </p>
-              </div>
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">📅</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card hover-lift rounded-2xl p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">
-                  Minhas Inscrições
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {registrations.length}
-                </p>
-              </div>
-              <div className="w-16 h-16 bg-gradient-success rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">✓</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card hover-lift rounded-2xl p-6 border-l-4 border-purple-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-600 mb-1">
-                  Perfil
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {isOrganizer ? 'Organizador' : 'Participante'}
-                </p>
-              </div>
-              <div className="w-16 h-16 bg-gradient-warm rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">⭐</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Minhas Inscrições */}
-        {!isOrganizer && registrations.length > 0 && (
-          <div className="mb-10 animate-slide-in">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Minhas Inscrições</h2>
-              <Link
-                to="/registrations"
-                className="text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors"
-              >
-                Ver todas →
-              </Link>
-            </div>
-            <div className="glass-card rounded-2xl overflow-hidden shadow-xl">
-              <ul className="divide-y divide-gray-100">
-                {registrations.map((registration) => (
-                  <li key={registration.id} className="hover:bg-purple-50 transition-colors">
-                    <div className="px-6 py-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            {registration.evento.titulo}
-                          </h3>
-                          <p className="text-sm text-gray-600 flex items-center">
-                            <span className="mr-2">📅</span>
-                            {new Date(registration.evento.data_inicio).toLocaleDateString('pt-BR')}
-                          </p>
-                        </div>
-                        <div className="ml-4">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                            registration.status === 'APROVADA' || registration.status === 'CONFIRMADA'
-                              ? 'bg-green-100 text-green-800'
-                              : registration.status === 'PENDENTE'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {registration.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Botão Criar Evento (Organizador) */}
-        {isOrganizer && (
-          <div className="mb-10 animate-fade-in">
-            <Link
-              to="/events/create"
-              className="inline-flex items-center btn-gradient text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-            >
-              <span className="mr-2">➕</span>
-              Criar Novo Evento
-            </Link>
-          </div>
-        )}
-
-        {/* Eventos Recentes */}
-        <div className="animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Eventos Recentes</h2>
-            <Link
-              to="/events"
-              className="text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors"
-            >
-              Ver todos →
-            </Link>
-          </div>
-          {events.length === 0 ? (
-            <div className="glass-card rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-4">📅</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum evento encontrado</h3>
-              <p className="text-gray-600 mb-6">
-                {isOrganizer 
-                  ? 'Crie seu primeiro evento para começar!' 
-                  : 'Ainda não há eventos disponíveis'}
-              </p>
-              {isOrganizer && (
-                <Link
-                  to="/events/create"
-                  className="inline-block btn-gradient text-white px-6 py-3 rounded-xl font-semibold"
-                >
-                  Criar Primeiro Evento
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {events.map((event) => (
-              <div key={event.id} className="glass-card hover-lift rounded-2xl overflow-hidden shadow-xl">
-                <div className="p-6">
-                  <div className="mb-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-                      event.tipo === 'GRATUITO' ? 'bg-gradient-success' : 'bg-gradient-primary'
-                    }`}>
-                      <span className="text-2xl">🎉</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-                      {event.titulo}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                      {event.descricao}
+        {/* Action Cards - Lado a lado */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+          <Link to="/events" style={{ textDecoration: 'none' }}>
+            <div className="card" style={{ cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                  <div style={{ width: '56px', height: '56px', background: '#DBEAFE', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                    📅
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>
+                      Eventos Disponíveis
+                    </p>
+                    <p style={{ fontSize: '36px', fontWeight: 700, color: '#2563EB', margin: 0 }}>
+                      {events.length}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-600 flex items-center">
-                      <span className="mr-1">📅</span>
-                      {new Date(event.data_inicio).toLocaleDateString('pt-BR')}
-                    </span>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                      event.tipo === 'GRATUITO'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                </div>
+                <span style={{ color: '#9CA3AF', fontSize: '20px' }}>→</span>
+              </div>
+            </div>
+          </Link>
+
+          <Link to="/registrations" style={{ textDecoration: 'none' }}>
+            <div className="card" style={{ cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                  <div style={{ width: '56px', height: '56px', background: '#D1FAE5', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                    ✓
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>
+                      Minhas Inscrições
+                    </p>
+                    <p style={{ fontSize: '36px', fontWeight: 700, color: '#2563EB', margin: 0 }}>
+                      {registrations.length}
+                    </p>
+                  </div>
+                </div>
+                <span style={{ color: '#9CA3AF', fontSize: '20px' }}>→</span>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Card: Tornar-se Organizador */}
+        {!isOrganizer && (
+          <div className="card">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                <div style={{ width: '64px', height: '64px', background: 'linear-gradient(135deg, #A855F7 0%, #EC4899 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+                  📢
+                </div>
+                <div>
+                  <h3 style={{ marginBottom: '4px' }}>Torne-se um Organizador</h3>
+                  <p style={{ fontSize: '14px', color: '#6B7280', margin: 0 }}>
+                    Crie e gerencie seus próprios eventos. Aprove inscrições e muito mais
+                  </p>
+                </div>
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={async () => {
+                  if (confirm('Deseja se tornar um organizador? Você poderá criar e gerenciar eventos!')) {
+                    try {
+                      setBecomingOrganizer(true);
+                      await becomeOrganizer();
+                    } catch (error: any) {
+                      alert(error.message || 'Erro ao tornar-se organizador');
+                    } finally {
+                      setBecomingOrganizer(false);
+                    }
+                  }
+                }}
+                disabled={becomingOrganizer}
+              >
+                {becomingOrganizer ? 'Processando...' : 'Tornar-se Organizador'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Minhas Inscrições e Eventos Recentes - Lado a lado */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          {/* Minhas Inscrições */}
+          {!isOrganizer && registrations.length > 0 && (
+            <div className="card card-sm">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h2 style={{ margin: 0 }}>Minhas Inscrições</h2>
+                <Link to="/registrations" style={{ fontSize: '14px', color: '#4F46E5', fontWeight: 600, textDecoration: 'none' }}>
+                  Ver todas →
+                </Link>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {registrations.slice(0, 3).map((registration) => (
+                  <Link
+                    key={registration.id}
+                    to={`/events/${registration.evento.id}`}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    <div style={{ padding: '12px', border: '1px solid #E5E7EB', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#4F46E5'; e.currentTarget.style.background = '#EEF2FF'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.background = 'transparent'; }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                        <span style={{ fontSize: '20px' }}>📅</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#111827', margin: 0, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {registration.evento.titulo}
+                          </h3>
+                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>
+                            {new Date(registration.evento.data_inicio).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`badge ${registration.status === 'APROVADA' || registration.status === 'CONFIRMADA' ? 'badge-success' : registration.status === 'PENDENTE' ? 'badge-warning' : 'badge-error'}`}>
+                        {registration.status}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Eventos Recentes */}
+          <div className="card card-sm">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ margin: 0 }}>Eventos Recentes</h2>
+              <Link to="/events" style={{ fontSize: '14px', color: '#4F46E5', fontWeight: 600, textDecoration: 'none' }}>
+                Ver todos →
+              </Link>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {events.slice(0, 3).map((event) => (
+                <Link
+                  key={event.id}
+                  to={`/events/${event.id}`}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <div style={{ padding: '12px', border: '1px solid #E5E7EB', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#4F46E5'; e.currentTarget.style.background = '#EEF2FF'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.background = 'transparent'; }}>
+                    <span style={{ fontSize: '20px' }}>🎉</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#111827', margin: 0, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {event.titulo}
+                      </h3>
+                      <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {event.descricao}
+                      </p>
+                    </div>
+                    <span className={`badge ${event.tipo === 'GRATUITO' ? 'badge-success' : 'badge-info'}`}>
                       {event.tipo === 'GRATUITO' ? 'Grátis' : `R$ ${event.preco.toFixed(2)}`}
                     </span>
                   </div>
-                  <Link
-                    to={`/events/${event.id}`}
-                    className="block w-full text-center btn-gradient text-white px-4 py-3 rounded-xl text-sm font-semibold"
-                  >
-                    Ver Detalhes
-                  </Link>
-                </div>
-              </div>
-            ))}
+                </Link>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </Layout>
   );
 }
-

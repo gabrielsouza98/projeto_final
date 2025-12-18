@@ -73,3 +73,9 @@ export class FazerCheckinUseCase {
 
 
 
+
+
+
+
+
+

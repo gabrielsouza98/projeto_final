@@ -1,4 +1,4 @@
-// Página de Mensagens
+// Página de Mensagens - Refatorada com Design System
 
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import api from '../config/api';
+import { Card, Button, Input } from '../components/ui';
 
 interface Message {
   id: string;
@@ -145,7 +146,7 @@ export default function Messages() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
         </div>
       </Layout>
     );
@@ -155,16 +156,17 @@ export default function Messages() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold text-gradient mb-3">Mensagens</h1>
-          <p className="text-lg text-gray-600">Converse com seus amigos</p>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mensagens</h1>
+          <p className="text-base text-gray-600">Converse com seus amigos</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Lista de Conversas */}
           <div className="lg:col-span-1">
-            <div className="glass-card rounded-2xl overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-xl font-bold text-gray-900">Conversas</h2>
               </div>
@@ -179,19 +181,19 @@ export default function Messages() {
                     <button
                       key={conv.userId}
                       onClick={() => setSelectedUser(conv.userId)}
-                      className={`w-full p-4 text-left hover:bg-purple-50 transition-colors border-b border-gray-100 ${
-                        selectedUser === conv.userId ? 'bg-purple-100' : ''
+                      className={`w-full p-4 text-left hover:bg-indigo-50 transition-colors border-b border-gray-100 ${
+                        selectedUser === conv.userId ? 'bg-indigo-100' : ''
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white font-bold">
                               {conv.userName.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{conv.userName}</h3>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-900 truncate">{conv.userName}</h3>
                             {conv.lastMessage && (
                               <p className="text-sm text-gray-600 line-clamp-1">
                                 {conv.lastMessage.conteudo}
@@ -200,7 +202,7 @@ export default function Messages() {
                           </div>
                         </div>
                         {conv.unreadCount > 0 && (
-                          <span className="bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                          <span className="bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 ml-2">
                             {conv.unreadCount}
                           </span>
                         )}
@@ -209,73 +211,80 @@ export default function Messages() {
                   ))
                 )}
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Área de Mensagens */}
           <div className="lg:col-span-2">
             {selectedUser ? (
-              <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[600px]">
+              <Card padding="none" className="flex flex-col h-[600px] overflow-hidden">
                 {/* Header da Conversa */}
-                <div className="p-4 border-b border-gray-200 bg-gradient-primary text-white">
+                <div className="p-4 border-b border-gray-200 bg-indigo-500 text-white">
                   <h2 className="text-xl font-bold">{selectedConversation?.userName}</h2>
                 </div>
 
                 {/* Mensagens */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message) => {
-                    const isOwn = message.remetente_id === state.user?.id;
-                    return (
-                      <div
-                        key={message.id}
-                        className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-                      >
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-gray-500 mt-8">
+                      <p>Nenhuma mensagem ainda. Comece a conversar!</p>
+                    </div>
+                  ) : (
+                    messages.map((message) => {
+                      const isOwn = message.remetente_id === state.user?.id;
+                      return (
                         <div
-                          className={`max-w-[70%] rounded-2xl p-4 ${
-                            isOwn
-                              ? 'bg-gradient-primary text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
+                          key={message.id}
+                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
-                          <p className="text-sm">{message.conteudo}</p>
-                          <p className={`text-xs mt-2 ${
-                            isOwn ? 'text-white/70' : 'text-gray-500'
-                          }`}>
-                            {new Date(message.timestamp).toLocaleTimeString('pt-BR', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
+                          <div
+                            className={`max-w-[70%] rounded-xl p-4 ${
+                              isOwn
+                                ? 'bg-indigo-500 text-white'
+                                : 'bg-white text-gray-900 border border-gray-200'
+                            }`}
+                          >
+                            <p className="text-sm">{message.conteudo}</p>
+                            <p className={`text-xs mt-2 ${
+                              isOwn ? 'text-white/70' : 'text-gray-500'
+                            }`}>
+                              {new Date(message.timestamp).toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input de Mensagem */}
-                <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200">
+                <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white">
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Digite sua mensagem..."
-                      className="flex-1 input-modern px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                      className="flex-1"
                     />
-                    <button
+                    <Button
                       type="submit"
-                      className="btn-gradient px-6 py-3 text-white font-semibold rounded-xl"
+                      variant="primary"
+                      size="md"
                     >
                       Enviar
-                    </button>
+                    </Button>
                   </div>
                 </form>
-              </div>
+              </Card>
             ) : (
-              <div className="glass-card rounded-2xl p-12 text-center h-[600px] flex items-center justify-center">
-                <div>
-                  <div className="text-6xl mb-4">💬</div>
+              <Card padding="lg" className="h-[600px] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-5xl mb-4">💬</div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
                     Selecione uma conversa
                   </h3>
@@ -283,7 +292,7 @@ export default function Messages() {
                     Escolha uma conversa da lista para começar a conversar
                   </p>
                 </div>
-              </div>
+              </Card>
             )}
           </div>
         </div>
@@ -291,6 +300,3 @@ export default function Messages() {
     </Layout>
   );
 }
-
-
-

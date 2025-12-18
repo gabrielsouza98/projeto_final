@@ -15,7 +15,13 @@ router.post('/login', AuthController.login);
 // GET /auth/me - Obter dados do usuário autenticado (protegida)
 router.get('/me', authMiddleware, AuthController.me);
 
+// PUT /auth/become-organizer - Tornar-se organizador (protegida)
+router.put('/become-organizer', authMiddleware, AuthController.becomeOrganizer);
+
 export default router;
+
+
+
 
 
 

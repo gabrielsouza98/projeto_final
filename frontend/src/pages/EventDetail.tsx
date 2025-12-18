@@ -1,4 +1,4 @@
-// Página de Detalhes do Evento
+// Página de Detalhes do Evento - Refatorada com Design System
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import api from '../config/api';
+import { Card, Badge, Button } from '../components/ui';
 
 interface Event {
   id: string;
@@ -109,7 +110,7 @@ export default function EventDetail() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
         </div>
       </Layout>
     );
@@ -118,13 +119,13 @@ export default function EventDetail() {
   if (error && !event) {
     return (
       <Layout>
-        <div className="glass-card rounded-2xl p-12 text-center">
-          <div className="text-6xl mb-4">❌</div>
+        <Card padding="lg" className="text-center">
+          <div className="text-5xl mb-4">❌</div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">{error}</h3>
-          <Link to="/events" className="text-purple-600 hover:text-purple-700">
+          <Link to="/events" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Voltar para eventos
           </Link>
-        </div>
+        </Card>
       </Layout>
     );
   }
@@ -133,60 +134,60 @@ export default function EventDetail() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Botão Voltar */}
         <Link
           to="/events"
-          className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6"
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
         >
           <span className="mr-2">←</span>
           Voltar para eventos
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conteúdo Principal */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="glass-card rounded-2xl p-8 animate-fade-in">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">{event.titulo}</h1>
-              {event.descricao_curta && (
-                <p className="text-xl text-gray-600 mb-6">{event.descricao_curta}</p>
-              )}
-              <div className="flex flex-wrap gap-3">
-                <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
-                  event.tipo === 'GRATUITO'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-blue-100 text-blue-800'
-                }`}>
-                  {event.tipo === 'GRATUITO' ? 'Grátis' : `R$ ${event.preco.toFixed(2)}`}
-                </span>
-                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
-                  {event.status}
-                </span>
-                {event.nota_media > 0 && (
-                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
-                    ⭐ {event.nota_media.toFixed(1)}
-                  </span>
-                )}
+            {/* Header do Evento */}
+            <Card padding="lg">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{event.titulo}</h1>
+                  {event.descricao_curta && (
+                    <p className="text-lg text-gray-600 mb-4">{event.descricao_curta}</p>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2 ml-4">
+                  <Badge variant={event.tipo === 'GRATUITO' ? 'success' : 'info'}>
+                    {event.tipo === 'GRATUITO' ? 'Grátis' : `R$ ${event.preco.toFixed(2)}`}
+                  </Badge>
+                  <Badge variant="neutral">{event.status}</Badge>
+                  {event.nota_media > 0 && (
+                    <Badge variant="warning">
+                      ⭐ {event.nota_media.toFixed(1)}
+                    </Badge>
+                  )}
+                </div>
               </div>
-            </div>
+            </Card>
 
             {/* Descrição */}
-            <div className="glass-card rounded-2xl p-8 animate-slide-in">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Sobre o Evento</h2>
+            <Card padding="lg">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Sobre o Evento</h2>
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                 {event.descricao}
               </p>
-            </div>
+            </Card>
 
             {/* Informações de Pagamento (se pago) */}
             {event.tipo === 'PAGO' && (
-              <div className="glass-card rounded-2xl p-8 animate-slide-in border-l-4 border-blue-500">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">💳 Informações de Pagamento</h2>
+              <Card padding="lg" className="border-l-4 border-indigo-500">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">💳 Informações de Pagamento</h2>
                 {event.chave_pix && (
                   <div className="mb-4">
                     <p className="text-sm font-semibold text-gray-600 mb-1">Chave PIX:</p>
-                    <p className="text-lg font-mono bg-gray-100 p-3 rounded-lg">{event.chave_pix}</p>
+                    <p className="text-base font-mono bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      {event.chave_pix}
+                    </p>
                   </div>
                 )}
                 {event.instrucoes_pagamento && (
@@ -195,15 +196,15 @@ export default function EventDetail() {
                     <p className="text-gray-700 whitespace-pre-line">{event.instrucoes_pagamento}</p>
                   </div>
                 )}
-              </div>
+              </Card>
             )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Informações */}
-            <div className="glass-card rounded-2xl p-6 animate-fade-in">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">📅 Informações</h3>
+            <Card padding="md">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">📅 Informações</h3>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-600 mb-1">Data de Início</p>
@@ -240,13 +241,14 @@ export default function EventDetail() {
                   <div className="flex items-center justify-between">
                     <p className="text-gray-900">{event.organizador.nome}</p>
                     {isRegistered && event.organizador.id !== state.user?.id && (
-                      <button
+                      <Button
                         onClick={() => handleRequestFriend(event.organizador.id)}
                         disabled={requestingFriend}
-                        className="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                        variant="outline"
+                        size="sm"
                       >
                         {requestingFriend ? 'Enviando...' : '👥 Adicionar'}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -257,38 +259,43 @@ export default function EventDetail() {
                   </div>
                 )}
               </div>
-            </div>
+            </Card>
 
             {/* Ações */}
             {!isOrganizer && (
-              <div className="glass-card rounded-2xl p-6 animate-fade-in">
+              <Card padding="md">
                 {error && (
-                  <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4">
-                    {error}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-red-800">{error}</p>
                   </div>
                 )}
                 {isRegistered ? (
                   <div className="text-center">
                     <div className="text-4xl mb-4">✅</div>
-                    <p className="text-lg font-semibold text-gray-900 mb-4">
+                    <p className="text-base font-semibold text-gray-900 mb-4">
                       Você está inscrito neste evento!
                     </p>
                     <Link
                       to="/registrations"
-                      className="block w-full text-center btn-gradient text-white px-4 py-3 rounded-xl text-sm font-semibold"
+                      className="block w-full"
                     >
-                      Ver Minhas Inscrições
+                      <Button variant="primary" size="md" className="w-full">
+                        Ver Minhas Inscrições
+                      </Button>
                     </Link>
                   </div>
                 ) : (
                   <div>
-                    <button
+                    <Button
                       onClick={handleRegister}
                       disabled={registering || (event.status !== 'INSCRICOES_ABERTAS' && event.status !== 'PUBLICADO')}
-                      className="btn-gradient w-full py-3 px-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      variant="primary"
+                      size="lg"
+                      isLoading={registering}
+                      className="w-full"
                     >
                       {registering ? 'Inscrevendo...' : 'Inscrever-se no Evento'}
-                    </button>
+                    </Button>
                     {event.status !== 'INSCRICOES_ABERTAS' && event.status !== 'PUBLICADO' && (
                       <p className="text-sm text-gray-600 text-center mt-3">
                         Inscrições não estão abertas (Status: {event.status})
@@ -296,36 +303,42 @@ export default function EventDetail() {
                     )}
                   </div>
                 )}
-              </div>
+              </Card>
             )}
 
             {isOrganizer && event.organizador.id === state.user?.id && (
-              <div className="glass-card rounded-2xl p-6 animate-fade-in">
+              <Card padding="md">
                 <Link
                   to={`/events/${id}/manage`}
-                  className="block w-full text-center btn-gradient text-white px-4 py-3 rounded-xl text-sm font-semibold mb-3"
+                  className="block w-full mb-3"
                 >
-                  Gerenciar Inscrições
+                  <Button variant="primary" size="md" className="w-full">
+                    Gerenciar Inscrições
+                  </Button>
                 </Link>
                 <Link
                   to={`/events/${id}/edit`}
-                  className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl text-sm font-semibold"
+                  className="block w-full"
                 >
-                  Editar Evento
+                  <Button variant="secondary" size="md" className="w-full">
+                    Editar Evento
+                  </Button>
                 </Link>
-              </div>
+              </Card>
             )}
 
             {/* Avaliar Evento (se participante e evento finalizado) */}
             {!isOrganizer && isRegistered && event.status === 'FINALIZADO' && (
-              <div className="glass-card rounded-2xl p-6 animate-fade-in">
+              <Card padding="md">
                 <Link
                   to={`/events/${id}/rate`}
-                  className="block w-full text-center btn-gradient text-white px-4 py-3 rounded-xl text-sm font-semibold"
+                  className="block w-full"
                 >
-                  ⭐ Avaliar Evento
+                  <Button variant="primary" size="md" className="w-full">
+                    ⭐ Avaliar Evento
+                  </Button>
                 </Link>
-              </div>
+              </Card>
             )}
           </div>
         </div>
@@ -333,4 +346,3 @@ export default function EventDetail() {
     </Layout>
   );
 }
-

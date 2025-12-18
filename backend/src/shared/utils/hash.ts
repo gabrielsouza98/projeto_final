@@ -20,3 +20,9 @@ export async function comparePassword(senha: string, hash: string): Promise<bool
 
 
 
+
+
+
+
+
+

@@ -9,6 +9,7 @@ export const api = {
       register: `${API_BASE_URL}/auth/register`,
       login: `${API_BASE_URL}/auth/login`,
       me: `${API_BASE_URL}/auth/me`,
+      becomeOrganizer: `${API_BASE_URL}/auth/become-organizer`,
     },
     events: {
       list: `${API_BASE_URL}/events`,

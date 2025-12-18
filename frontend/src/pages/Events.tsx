@@ -1,10 +1,11 @@
-// Página de Listagem de Eventos
+// Página de Listagem de Eventos - Refatorada com Design System
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import apiClient from '../services/api';
 import api from '../config/api';
+import { Card, Badge, Input, Button } from '../components/ui';
 
 interface Event {
   id: string;
@@ -63,7 +64,7 @@ export default function Events() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
         </div>
       </Layout>
     );
@@ -71,38 +72,34 @@ export default function Events() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold text-gradient mb-3">Eventos Disponíveis</h1>
-          <p className="text-lg text-gray-600">Descubra e participe de eventos incríveis</p>
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Eventos Disponíveis</h1>
+          <p className="text-base text-gray-600">Descubra e participe de eventos incríveis</p>
         </div>
 
         {/* Filtros */}
-        <div className="glass-card rounded-2xl p-6 mb-8 animate-slide-in">
+        <Card padding="md">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="search" className="block text-sm font-semibold text-gray-700 mb-2">
-                Buscar
-              </label>
-              <input
-                id="search"
+              <Input
+                label="Buscar"
                 type="text"
                 placeholder="Digite o nome do evento..."
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="input-modern w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               />
             </div>
             <div>
-              <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="status" className="block text-sm font-semibold text-gray-900 mb-1.5">
                 Status
               </label>
               <select
                 id="status"
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="input-modern w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               >
                 <option value="">Todos</option>
                 <option value="INSCRICOES_ABERTAS">Inscrições Abertas</option>
@@ -111,14 +108,14 @@ export default function Events() {
               </select>
             </div>
             <div>
-              <label htmlFor="tipo" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="tipo" className="block text-sm font-semibold text-gray-900 mb-1.5">
                 Tipo
               </label>
               <select
                 id="tipo"
                 value={filters.tipo}
                 onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
-                className="input-modern w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               >
                 <option value="">Todos</option>
                 <option value="GRATUITO">Gratuito</option>
@@ -126,35 +123,41 @@ export default function Events() {
               </select>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Lista de Eventos */}
         {events.length === 0 ? (
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <div className="text-6xl mb-4">🔍</div>
+          <Card padding="lg" className="text-center">
+            <div className="text-5xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum evento encontrado</h3>
             <p className="text-gray-600">Tente ajustar os filtros de busca</p>
-          </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <div key={event.id} className="glass-card hover-lift rounded-2xl overflow-hidden shadow-xl">
-                <div className="p-6">
-                  <div className="mb-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-                      event.tipo === 'GRATUITO' ? 'bg-gradient-success' : 'bg-gradient-primary'
+              <Link
+                key={event.id}
+                to={`/events/${event.id}`}
+                className="block group"
+              >
+                <Card padding="md" hover className="h-full flex flex-col">
+                  <div className="mb-4 flex-1">
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 shadow-lg ${
+                      event.tipo === 'GRATUITO' 
+                        ? 'bg-gradient-to-br from-green-500 to-green-600' 
+                        : 'bg-gradient-to-br from-indigo-500 to-indigo-600'
                     }`}>
                       <span className="text-2xl">🎉</span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
                       {event.titulo}
                     </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-sm text-gray-600 line-clamp-3 mb-4 leading-relaxed">
                       {event.descricao_curta || event.descricao}
                     </p>
                   </div>
 
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-2.5 mb-4 pb-4 border-b border-gray-100">
                     <div className="flex items-center text-sm text-gray-600">
                       <span className="mr-2">📅</span>
                       {new Date(event.data_inicio).toLocaleDateString('pt-BR', {
@@ -176,29 +179,22 @@ export default function Events() {
                   </div>
 
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                      event.tipo === 'GRATUITO'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                    <Badge variant={event.tipo === 'GRATUITO' ? 'success' : 'info'} size="sm">
                       {event.tipo === 'GRATUITO' ? 'Grátis' : `R$ ${event.preco.toFixed(2)}`}
-                    </span>
+                    </Badge>
                     {event.nota_media > 0 && (
-                      <span className="flex items-center text-sm text-gray-600">
+                      <span className="flex items-center text-sm font-semibold text-amber-600">
                         <span className="mr-1">⭐</span>
                         {event.nota_media.toFixed(1)}
                       </span>
                     )}
                   </div>
 
-                  <Link
-                    to={`/events/${event.id}`}
-                    className="block w-full text-center btn-gradient text-white px-4 py-3 rounded-xl text-sm font-semibold"
-                  >
-                    Ver Detalhes
-                  </Link>
-                </div>
-              </div>
+                  <div className="w-full text-center bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
+                    Ver Detalhes →
+                  </div>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
@@ -206,4 +202,3 @@ export default function Events() {
     </Layout>
   );
 }
-

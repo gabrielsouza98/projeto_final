@@ -1,4 +1,4 @@
-// Página de Amizades
+// Página de Amizades - Refatorada com Design System
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import api from '../config/api';
+import { Card, Badge, Button } from '../components/ui';
 
 interface Friendship {
   id: string;
@@ -72,7 +73,7 @@ export default function Friends() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
         </div>
       </Layout>
     );
@@ -83,84 +84,84 @@ export default function Friends() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold text-gradient mb-3">Amizades</h1>
-          <p className="text-lg text-gray-600">Gerencie suas conexões e solicitações</p>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Amizades</h1>
+          <p className="text-base text-gray-600">Gerencie suas conexões e solicitações</p>
         </div>
 
         {/* Filtros */}
-        <div className="glass-card rounded-2xl p-6 mb-6">
-          <div className="flex gap-3">
-            <button
+        <Card padding="md">
+          <div className="flex gap-3 flex-wrap">
+            <Button
+              variant={filter === '' ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setFilter('')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                filter === '' ? 'bg-gradient-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
             >
               Todas
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={filter === 'PENDENTE' ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setFilter('PENDENTE')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                filter === 'PENDENTE' ? 'bg-gradient-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
             >
               Pendentes ({pendingRequests.length})
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={filter === 'ACEITA' ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setFilter('ACEITA')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                filter === 'ACEITA' ? 'bg-gradient-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
             >
               Amigos ({acceptedFriends.length})
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
 
         {/* Solicitações Pendentes */}
         {filter === '' || filter === 'PENDENTE' ? (
           pendingRequests.length > 0 && (
-            <div className="mb-8">
+            <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Solicitações Pendentes</h2>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pendingRequests.map((friendship) => {
                   const isReceiver = friendship.destinatario_id === state.user?.id;
                   const friend = isReceiver ? friendship.solicitante : friendship.destinatario;
                   
                   return (
-                    <div key={friendship.id} className="glass-card hover-lift rounded-2xl p-6 animate-slide-in">
+                    <Card key={friendship.id} padding="md" hover>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
+                        <div className="flex items-center space-x-4 flex-1">
+                          <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-2xl text-white font-bold">
                               {friend?.nome.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">{friend?.nome}</h3>
-                            <p className="text-sm text-gray-600">{friend?.email}</p>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-bold text-gray-900 truncate">{friend?.nome}</h3>
+                            <p className="text-sm text-gray-600 truncate">{friend?.email}</p>
                           </div>
                         </div>
                         {isReceiver && (
-                          <div className="flex gap-2">
-                            <button
+                          <div className="flex gap-2 ml-4">
+                            <Button
+                              variant="success"
+                              size="sm"
                               onClick={() => handleAccept(friendship.id)}
-                              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold transition-colors"
                             >
                               ✅ Aceitar
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
                               onClick={() => handleReject(friendship.id)}
-                              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition-colors"
                             >
                               ❌ Recusar
-                            </button>
+                            </Button>
                           </div>
                         )}
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
               </div>
@@ -175,11 +176,11 @@ export default function Friends() {
               {filter === 'ACEITA' ? 'Meus Amigos' : 'Amigos'}
             </h2>
             {acceptedFriends.length === 0 ? (
-              <div className="glass-card rounded-2xl p-12 text-center">
-                <div className="text-6xl mb-4">👥</div>
+              <Card padding="lg" className="text-center">
+                <div className="text-5xl mb-4">👥</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum amigo ainda</h3>
                 <p className="text-gray-600">Conheça pessoas nos eventos e faça novas amizades!</p>
-              </div>
+              </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {acceptedFriends.map((friendship) => {
@@ -188,9 +189,9 @@ export default function Friends() {
                     : friendship.solicitante;
                   
                   return (
-                    <div key={friendship.id} className="glass-card hover-lift rounded-2xl p-6 animate-slide-in">
+                    <Card key={friendship.id} padding="md" hover>
                       <div className="text-center">
-                        <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-20 h-20 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
                           <span className="text-3xl text-white font-bold">
                             {friend?.nome.charAt(0).toUpperCase()}
                           </span>
@@ -199,12 +200,14 @@ export default function Friends() {
                         <p className="text-sm text-gray-600 mb-4">{friend?.email}</p>
                         <Link
                           to={`/messages?user=${friend?.id}`}
-                          className="block w-full text-center btn-gradient text-white px-4 py-2 rounded-xl text-sm font-semibold"
+                          className="block w-full"
                         >
-                          💬 Enviar Mensagem
+                          <Button variant="primary" size="md" className="w-full">
+                            💬 Enviar Mensagem
+                          </Button>
                         </Link>
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
               </div>
@@ -215,4 +218,3 @@ export default function Friends() {
     </Layout>
   );
 }
-

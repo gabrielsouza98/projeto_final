@@ -1,4 +1,4 @@
-// Página de Avaliar Evento
+// Página de Avaliar Evento - Refatorada com Design System
 
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import { useForm } from 'react-hook-form';
 import apiClient from '../services/api';
 import api from '../config/api';
+import { Card, Button } from '../components/ui';
 
 interface RatingForm {
   nota: number;
@@ -68,7 +69,7 @@ export default function RateEvent() {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
         </div>
       </Layout>
     );
@@ -76,28 +77,29 @@ export default function RateEvent() {
 
   return (
     <Layout>
-      <div className="px-4 py-6 sm:px-0 max-w-2xl mx-auto">
+      <div className="space-y-6 max-w-2xl mx-auto">
         <Link
           to={`/events/${eventoId}`}
-          className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6"
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-700"
         >
           <span className="mr-2">←</span>
           Voltar para evento
         </Link>
 
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold text-gradient mb-3">Avaliar Evento</h1>
-          <p className="text-lg text-gray-600">{event?.titulo}</p>
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Avaliar Evento</h1>
+          <p className="text-base text-gray-600">{event?.titulo}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {error && (
-            <div className="glass-card rounded-2xl p-4 bg-red-50 border-l-4 border-red-500">
+            <Card padding="md" className="bg-red-50 border-l-4 border-red-500">
               <p className="text-red-700">{error}</p>
-            </div>
+            </Card>
           )}
 
-          <div className="glass-card rounded-2xl p-8">
+          <Card padding="lg">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Como foi sua experiência?</h2>
             
             {/* Nota */}
@@ -121,7 +123,7 @@ export default function RateEvent() {
                     />
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
                       nota >= num
-                        ? 'bg-gradient-primary text-white shadow-lg scale-110'
+                        ? 'bg-indigo-500 text-white shadow-lg scale-110'
                         : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
                     }`}>
                       {num}
@@ -143,26 +145,26 @@ export default function RateEvent() {
                 {...register('comentario')}
                 id="comentario"
                 rows={6}
-                className="input-modern w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                 placeholder="Conte-nos sobre sua experiência no evento..."
               />
             </div>
-          </div>
+          </Card>
 
           {/* Botões */}
           <div className="flex gap-4">
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={submitting}
-              className="btn-gradient px-8 py-3 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Enviando...' : 'Enviar Avaliação'}
-            </button>
-            <Link
-              to={`/events/${eventoId}`}
-              className="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
-            >
-              Cancelar
+            </Button>
+            <Link to={`/events/${eventoId}`}>
+              <Button variant="secondary" size="lg">
+                Cancelar
+              </Button>
             </Link>
           </div>
         </form>
@@ -170,4 +172,3 @@ export default function RateEvent() {
     </Layout>
   );
 }
-
